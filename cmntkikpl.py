@@ -1,52 +1,64 @@
 #!/usr/bin/env python
+from sys import argv
 
+passages = [{1,4},{0,2},{1,3},{2,7},{0,5,8},{4,6},{5,7},{3,6,9},{4,9},{7,8}]
+pass_ext = [{1,4},{0,2,5,7},{1,3,6},{2,7},{0,5,8,9},{4,6,1,8},{5,7,2,9},{3,6,9,1},{4,9,5},{7,8,4,6}]
 
-class FileManager:
-    def read_file(self, filename):
-        print("[FileManager] read_file : open file " + filename)
-        with open(filename) as f:
-            _content = f.readlines()
-        return _content
+class cmntkikpl:
+    def __init__(self, path):
+        self.path = path
+        self.fantome = ''
+        self.role = ''
+        self.question = {}
+        self.personnage = {}
+        self.suspe = {}
+        self.Bloque = {}
 
-    def write_file(self, filename, linebuffer):
-        print("[FileManager] write_file : open file " + filename)
-        file = open(filename, "w")
-        for line in linebuffer:
-            file.write(line)
-        file.close()
+    def get_role(self):
+        infof = open(self.path + '/info.txt', 'r')
+        line = infof.readline()
+        infof.close()
+        if line == '**************************':
+            self.role = 'inspecteur'
+            return
+        if line.__contains__('!!! Le fantôme est : '):
+            self.role = 'fantome'
+            self.fantome = line[len('!!! Le fantôme est : '):]
+            line = infof.readline()
+            return
+        print('no role found !')
+        exit()
 
+    def get_context(self):
+        infof = open(self.path + '/info.txt', 'r')
+        lines = infof.readlines()
+        infof.close()
+        self.Bloque += lines[lines.:]
+        infof = open(self.path + '/info.txt', 'r')
+        lines = infof.readlines()
+        infof.close()
 
-class Serializer:
-    def serialize(self, linebuffer):
-        print("[serializer] serialize : start serialize")
-        for line in linebuffer:
-            print(line)
+    def get_question(self):
+        qf = open(self.path + '/questions.txt', 'r')
+        lines = qf.readlines()
+        qf.close()
+        self.question = lines
 
-    def deserialize(self, linebuffer):
-        print("[deserialize] deserialize : start deserialize")
-        for line in linebuffer:
-            print(line)
+    def write_response(self):
+        rf = open(self.path + '/reponses.txt', 'w')
 
-class CmntKiKpl:
-    _level = 0
+    def start(self):
+        fini = False
+        self.get_role()
+        self.get_context()
+        while fini:
+            self.get_question()
+            self.write_response()
+            infof = open(self.path + '/info.txt', 'r')
+            lines = infof.readlines()
+            infof.close()
+            if len(lines) > 0:
+                fini = "Score final" in lines[-1]
+        print("partie finie")
 
-    def __init__(self, level):
-        self._level = level
-
-    def play(self):
-        print("[cmntkikpl] play : ia play")
-        if self._level == 0:
-            self.playlevelz()
-
-    def playlevelz(self):
-        print("[cmntkikpl] playlevelz : play level 0")
-
-def main():
-    filemanager = FileManager()
-    serializer = Serializer()
-    ia = CmntKiKpl(0)
-    linebuffer = filemanager.read_file("test")
-    serializer.serialize(linebuffer)
-
-if __name__ == "__main__":
-    main()
+cmntkikpl(argv[0]).start()

@@ -3,7 +3,7 @@ from time import sleep
 from threading import Thread
 import dummy0, dummy1
 
-latence = 0.01
+latence = 5
 permanents, deux, avant, apres = {'rose'}, {'rouge','gris','bleu'}, {'violet','marron'}, {'noir','blanc'}
 couleurs = avant | permanents | apres | deux
 passages = [{1,4},{0,2},{1,3},{2,7},{0,5,8},{4,6},{5,7},{3,6,9},{4,9},{7,8}]
@@ -98,14 +98,14 @@ class joueur:
                     return [q for q in party.personnages if p.position == q.position]
                 if p.couleur == "gris":
                     w = demander("Quelle salle obscurcir ? (0-9)",self)
-                    party.shadow = int(w) if w.isnumeric() and int(w) in range(10) else (0
+                    party.shadow = int(w) if w.isnumeric() and int(w) in range(10) else (0)
                     informer("REPONSE INTERPRETEE : "+str(party.shadow))
                 if p.couleur == "bleu":
-                    w = demander("Quelle salle bloquer ? (0-9)",self)
-                    x = int(w) if w.isnumeric() and int(w) in range(10) else 0
-                    w = demander("Quelle sortie ? Chosir parmi : "+str(passages[x]),self)
-                    y = int(w) if w.isnumeric() and int(w) in passages[x] else passages[x].copy().pop()
-                    informer("REPONSE INTERPRETEE : "+str({x,y}))       
+                    w = demander("Quelle salle bloquer ? (0-9)",self);
+                    x = int(w) if w.isnumeric() and int(w) in range(10) else 0;
+                    w = demander("Quelle sortie ? Chosir parmi : "+str(passages[x]),self);
+                    y = int(w) if w.isnumeric() and int(w) in passages[x] else passages[x].copy().pop();
+                    informer("REPONSE INTERPRETEE : "+str({x,y})) ;
                     party.bloque = {x,y}
         return [p]
                     
