@@ -5,4 +5,4 @@ TO DO :
 	ia
 	bug gestion
 
-server download link : OUPS...
+server download link : https://github.com/groznyniko/ia_fopera
