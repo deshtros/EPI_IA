@@ -1,5 +1,9 @@
-!/usr/bin/env python
-import serializer as Serializer
+#!/usr/bin/env python
+from sys import argv
+import parser as Parser
+
+passages = [{1,4},{0,2},{1,3},{2,7},{0,5,8},{4,6},{5,7},{3,6,9},{4,9},{7,8}]
+pass_ext = [{1,4},{0,2,5,7},{1,3,6},{2,7},{0,5,8,9},{4,6,1,8},{5,7,2,9},{3,6,9,1},{4,9,5},{7,8,4,6}]
 
 class cmntkikpl:
     def __init__(self, path):
@@ -34,8 +38,28 @@ class cmntkikpl:
     def parse_pos(self, elem):
         elem.split('-')
 
-class CmntKiKpl:
-    _level = 0
+    def get_context(self):
+        infof = open(self.path + '/infos.txt', 'r')
+        line = infof.readlines()
+        infof.close()
+        lineparsed = line[self.info_line].split(' ')
+        self.tour = lineparsed[0].split(':')[1]
+        self.score = lineparsed[1].split(':')[1]
+        self.ombre = lineparsed[2].split(':')[1]
+        self.bloque = line[self.info_line].split(':')[4]
+        self.info_line += 1
+        self.personnage = line[self.info_line].split(' ')
+        self.info_line += 1
+
+    def get_question(self):
+        qf = open(self.path + '/questions.txt', 'r')
+        lines = qf.readlines()
+        qf.close()
+        self.question = lines
+
+    def write_response(self):
+        rf = open(self.path + '/reponses.txt', 'w')
+        rf.close()
 
     def update_info(self):
         return
@@ -50,14 +74,8 @@ class CmntKiKpl:
             self.update_info()
             return
 
-def main():
-    filemanager = FileManager()
-    serializer = Serializer.Serializer()
-    ia = CmntKiKpl(0)
-    linebuffer = filemanager.read_file("test")
-    serializer.serialize(linebuffer)
-
     def start(self):
+        serializer = Parser.Serializer(self.path + '/infos.txt', self.path + '/out.txt')
         fini = False
         self.get_role()
         self.get_context()
