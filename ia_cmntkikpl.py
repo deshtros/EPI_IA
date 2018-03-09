@@ -32,9 +32,48 @@ class CmntKiKpl:
                 nb = nb_in_case
                 self.case_move = move
 
-    def player_red_personnage(self):
+    def play_red_personnage(self):
         case_allow = self.serializer.get_skill_case_allow()
         self.case_power = -1
+
+    def play_pink_personnage(self):
+        case_allow = self.serializer.get_skill_case_allow()
+        self.case_power = -1
+
+    def play_blue_personnage(self):
+        case_allow = self.serializer.get_skill_case_allow()
+        self.case_power = -1
+        self.jaiRienComprisMaBiteEstUnVolcan
+
+    def play_grey_personnage(self):
+        case_allow = self.serializer.get_skill_case_allow()
+        self.case_power = -1
+        if self.serializer.get_role() == 'fantome':
+            self.serializer.response(self.case_where_ghost_is)
+        else:
+            self.serializer.response(self.case_where_ghost_isnt)
+
+    def play_black_personnage(self):
+        case_allow = self.serializer.get_skill_case_allow()
+        if self.serializer.get_role() == 'fantome':
+            self.case_power = 0
+        else:
+            self.case_power = 1
+
+    def play_white_personnage(self):
+        case_allow = self.serializer.get_skill_case_allow()
+        self.case_power = 0
+        # parceque le pouvoir est super chiant, trop de cas à gerer (parsing de ouf)
+
+    def play_purple_personnage(self):
+        case_allow = self.serializer.get_skill_case_allow()
+        self.case_power = 0        
+        # parceque le pouvoir est super chiant, trop de cas à gerer (parsing de ouf)
+
+    def play_brown_personnage(self):
+        case_allow = self.serializer.get_skill_case_allow()
+        self.case_power = 0
+        # parceque le pouvoir est super chiant, trop de cas à gerer (parsing de ouf)
 
     def play_personnage_skill(self):
         if self.personnage == '':
