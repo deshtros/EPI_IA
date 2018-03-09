@@ -33,6 +33,7 @@ class CmntKiKpl:
                 self.case_move = move
 
     def player_red_personnage(self):
+        case_allow = self.serializer.get_skill_case_allow()
         self.case_power = -1
 
     def play_personnage_skill(self):
