@@ -17,20 +17,24 @@ class CmntKiKpl:
         self.case_power = -1
 
     def player_mov_fantome(self):
+        case_allow = self.serializer.get_skill_case_allow()
         nb = 8
-        for i, move in passages[self.serializer.get_movement_position()]:
+        for i, move in case_allow:
             nb_in_case = self.serializer._get_nb_personnage_in_case(move)
             if nb > nb_in_case:
                 nb = nb_in_case
-                self.case_move = move
+                self.case_move = i
+        self.serializer.write_answer(self.case_power)
 
     def player_mov_inspector(self):
+        case_allow = self.serializer.get_skill_case_allow()
         nb = 0
-        for i, move in passages[self.serializer.get_movement_position()]:
+        for i, move in case_allow:
             nb_in_case = self.serializer._get_nb_personnage_in_case(move)
             if nb < nb_in_case:
                 nb = nb_in_case
-                self.case_move = move
+                self.case_move = i
+        self.serializer.write_answer(self.case_power)
 
     def play_red_personnage(self):
         case_allow = self.serializer.get_skill_case_allow()
@@ -41,39 +45,62 @@ class CmntKiKpl:
         self.case_power = -1
 
     def play_blue_personnage(self):
-        case_allow = self.serializer.get_skill_case_allow()
+        self.case_power = 1
+        self.serializer.write_answer(self.case_power)
+        self.serializer.write_answer(self.case_power)
         self.case_power = -1
-        self.jaiRienComprisMaBiteEstUnVolcan
 
     def play_grey_personnage(self):
-        case_allow = self.serializer.get_skill_case_allow()
-        self.case_power = -1
+        self.case_power = 1
         if self.serializer.get_role() == 'fantome':
-            self.serializer.response(self.case_where_ghost_is)
+            p = 0
+            for i in 10:
+                if self.serializer._get_nb_personnage_in_case(i) > p:
+                    self.case_power = i
+                    p = self.serializer._get_nb_personnage_in_case(i)
         else:
-            self.serializer.response(self.case_where_ghost_isnt)
+            p = 8
+            for i in 10:
+                if self.serializer._get_nb_personnage_in_case(i) < p:
+                    self.case_power = i
+                    p = self.serializer._get_nb_personnage_in_case(i)
+        self.serializer.write_answer(self.case_power)
+        self.case_power = -1
 
     def play_black_personnage(self):
-        case_allow = self.serializer.get_skill_case_allow()
         if self.serializer.get_role() == 'fantome':
             self.case_power = 0
         else:
             self.case_power = 1
+        self.serializer.write_answer(self.case_power)
+        self.case_power = -1
 
     def play_white_personnage(self):
-        case_allow = self.serializer.get_skill_case_allow()
-        self.case_power = 0
-        # parceque le pouvoir est super chiant, trop de cas à gerer (parsing de ouf)
+        p = self.serializer._get_nb_personnage_in_case(i)
+        for i in p - 1:
+            case_allow = self.serializer.get_skill_case_allow()
+            g = 8
+            y = 0
+            for y, j in case_allow:
+                if self.serializer._get_nb_personnage_in_case(j) < g:
+                    g = self.serializer._get_nb_personnage_in_case(j)
+                    self.case_power = y
+            self.serializer.write_answer(self.case_power)
+        self.case_power = -1
+
+
 
     def play_purple_personnage(self):
         case_allow = self.serializer.get_skill_case_allow()
-        self.case_power = 0        
-        # parceque le pouvoir est super chiant, trop de cas à gerer (parsing de ouf)
+        self.case_power = -1y
+        self.serializer.write_answer('rose')
+        self.case_power = -1
 
     def play_brown_personnage(self):
         case_allow = self.serializer.get_skill_case_allow()
-        self.case_power = 0
-        # parceque le pouvoir est super chiant, trop de cas à gerer (parsing de ouf)
+        self.case_power = case_allow[0]
+        self.serializer.write_answer(self.case_power)
+        self.case_power = -1
 
     def play_personnage_skill(self):
         if self.personnage == '':
@@ -125,11 +152,14 @@ class CmntKiKpl:
         self.question = self.serializer.get_question()
         if self.question.content('Tuiles disponibles'):
             self.tuile_disponible(order)
-        if self.serializer.get_role() == 'fantome':
-            self.player_mov_fantome()
-        else:
-            self.player_mov_inspector()
-        self.play_persnnage_skill()
+        if self.question.content('positions disponibles'):
+            if self.serializer.get_role() == 'fantome':
+                self.player_mov_fantome()
+            else:
+                self.player_mov_inspector()
+        if self.question.content('Voulez-vous activer le pouvoir'):
+            self.serializer.write_answer(1)
+            self.play_persnnage_skill()
 
     def play(self):
         print('[cmntkikpl] play : ia play')
