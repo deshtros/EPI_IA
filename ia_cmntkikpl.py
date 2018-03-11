@@ -12,8 +12,8 @@ class CmntKiKpl:
         self.path = path
         serializer = Parser.Serializer(self.path + '/questions.txt', self.path + '/infos.txt', self.path + '/out.txt')
         self.game = g.Game(serializer)
-        self.fantome_order = ['rouge', 'blanc', 'noir', 'gris', 'bleu', 'rose', 'violet', 'maron']
-        self.inspector_order = ['noir', 'blanc', 'gris', 'rose', 'bleu', 'rouge', 'violet', 'maron']
+        self.fantome_order = ['rouge', 'blanc', 'noir', 'gris', 'bleu', 'rose', 'violet', 'marron']
+        self.inspector_order = ['noir', 'blanc', 'gris', 'rose', 'bleu', 'rouge', 'violet', 'marron']
         self.question = Parser.ServerMessage(Parser.ServerOutputType.NOT_IMPLEMENTED, 0, True) 
         self.personnage = ''
         self.case_move = -1
