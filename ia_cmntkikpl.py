@@ -137,21 +137,17 @@ class CmntKiKpl:
     def tuile_disponible(self, order):
         i = 0
         self.personnage = ''
-        if not self.question:
-            return
-        if not self.question.content:
-            return
         while order.__len__() > i:
-            if self.question.content.color == order[i]:
+            if self.question.content.__content__(order[i]):
                 if self.personnage == '':
-                    self.personnage = order[i]
+                    self.personnage = 0
                 if self.game.get_role() == 'fantome':
                     if self.game.is_alone(order[i]) == False:
-                        self.personnage = order[i]
+                        self.personnage = self.question.content.index(order[i])
                         i = order.__len__() - 1
                 else:
                     if self.game.is_alone(order[i]):
-                        self.personnage = order[i]
+                        self.personnage = self.question.content.index(order[i])
                         i = order.__len__() - 1
             i += 1
         if self.personnage == '':

@@ -10,7 +10,7 @@ class Game:
         self.serializer = serializer
         self.fantome = ''
         self.role = ''
-        self.question = Parser.ServerMessage(Parser.ServerOutputType.NOT_IMPLEMENTED, 0, True) 
+        self.question = Parser.ServerMessage(Parser.ServerOutputType.NOT_IMPLEMENTED, [], True)
         self.characterArray = []
         self.waysLockedArray = []
         self.turn = 0
