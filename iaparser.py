@@ -7,14 +7,16 @@ CHOOSE_CARD_TO_PLAY_SERVER_ASK = ["Tuiles", "disponibles"]
 ENABLE_POWER_SERVER_ASK = ["activer","le","pouvoir"]
 CHOOSE_POSITION_SERVER_ASK = ["positions","disponibles"]
 CHOOSE_COLOR_SERVER_ASK = ["Avec" "quelle" "couleur" "échanger"]
-GHOST_ROLE_INDICATION = ["!!!", "Le fantôme", "est"]
+GHOST_ROLE_SERVER_SAY = ["!!!", "Le","est"]
 TURN_SERVER_SAY = ["Tour", "de"]
 TURN_INFO_SERVER_SAY = ["Tour:", "Score:", "Ombre:", "Bloque:"]
 CHOOSE_ROOM_TO_BLOCK_SERVER_ASK = ["Quelle", "salle", "bloquer"]
 CHOOSE_EXIT_FROM_ROOM_TO_BLOCK_SERVER_ASK = ["Quelle", "sortie", "Chosir", "parmi"]
 CHOOSE_ROOM_TO_SHADOW_SERVER_ASK = ["Quelle", "salle", "obscurcir" ] 
+END_GAME_SERVER_SAY = ["Score","final"]
 
-SERVER_ASK_WORD_ARRAY = [CHOOSE_CARD_TO_PLAY_SERVER_ASK, ENABLE_POWER_SERVER_ASK, CHOOSE_POSITION_SERVER_ASK, CHOOSE_COLOR_SERVER_ASK,TURN_SERVER_SAY, TURN_INFO_SERVER_SAY, CHOOSE_ROOM_TO_BLOCK_SERVER_ASK, CHOOSE_EXIT_FROM_ROOM_TO_BLOCK_SERVER_ASK, CHOOSE_ROOM_TO_SHADOW_SERVER_ASK]
+SERVER_ASK_WORD_ARRAY = [CHOOSE_CARD_TO_PLAY_SERVER_ASK, ENABLE_POWER_SERVER_ASK, CHOOSE_POSITION_SERVER_ASK, CHOOSE_COLOR_SERVER_ASK, CHOOSE_ROOM_TO_BLOCK_SERVER_ASK, CHOOSE_EXIT_FROM_ROOM_TO_BLOCK_SERVER_ASK, CHOOSE_ROOM_TO_SHADOW_SERVER_ASK]
+SERVER_SAY_WORD_ARRAY = [GHOST_ROLE_SERVER_SAY, TURN_SERVER_SAY, TURN_INFO_SERVER_SAY, END_GAME_SERVER_SAY]
 
 class ServerOutputType(Enum):
     CHOOSE_CARD_TO_PLAY = 0
@@ -26,7 +28,9 @@ class ServerOutputType(Enum):
     CHOOSE_ROOM_TO_BLOCK = 6
     CHOOSE_EXIT_FROM_ROOM_TO_BLOCK = 7
     CHOOSE_ROOM_TO_SHADOW = 8
-    NOT_IMPLEMENTED = 9
+    END_GAME = 9
+    GHOST_ROLE = 10 
+    NOT_IMPLEMENTED = 11
 
 class ServerInputType(Enum):
     CHOOSE_CARD_TO_PLAY = 0
@@ -76,8 +80,6 @@ class iAMessage:
     def __repr__(self):
         return "[IAMessage] content: " + str(self.content) + " messageType: " + str(self.messageType) + '\n'
 
-
-
 def characterFronString(line):
     infoArray = line.split("-")
     character = Character(infoArray[0])
@@ -125,7 +127,6 @@ def getTurnInfofromLine(line):
             wayBloqued.append(int(numberString))
         return TurnInfo(turn, score, shadow, wayBloqued)
 
-
 def getPositionFromLine(line):
     positions = []
     line = line.split("{")[1]
@@ -135,15 +136,20 @@ def getPositionFromLine(line):
         positions.append(int(numberString))
     return positions
 
+def getColorGhostFromLine(line):
+    color = line.split(" : ")[1]
+    return color
+
 def checkLineWith(serverOutput, line):
     for word in serverOutput:
         if not word in line:
             return False
     return True
 
-
 def serverOutputWordToENum(possibleServerOutput):
-    if possibleServerOutput == CHOOSE_CARD_TO_PLAY_SERVER_ASK:
+    if possibleServerOutput == GHOST_ROLE_SERVER_SAY:
+        return ServerOutputType.GHOST_ROLE
+    elif possibleServerOutput == CHOOSE_CARD_TO_PLAY_SERVER_ASK:
         return ServerOutputType.CHOOSE_CARD_TO_PLAY
     elif possibleServerOutput == TURN_SERVER_SAY:
         return ServerOutputType.TURN_INDICATION
@@ -159,6 +165,8 @@ def serverOutputWordToENum(possibleServerOutput):
         return ServerOutputType.CHOOSE_EXIT_FROM_ROOM_TO_BLOCK
     elif possibleServerOutput == CHOOSE_ROOM_TO_SHADOW_SERVER_ASK:
         return ServerOutputType.CHOOSE_ROOM_TO_SHADOW
+    elif possibleServerOutput == END_GAME_SERVER_SAY:
+        return ServerOutputType.END_GAME
     else:
         return ServerOutputType.NOT_IMPLEMENTED
 
@@ -169,10 +177,6 @@ def serverOutputToServerMessage(line):
             serverOutput = serverOutputWordToENum(serverAskArray)
             if serverOutput == ServerOutputType.CHOOSE_CARD_TO_PLAY:
                 serverMessage = ServerMessage(ServerOutputType.CHOOSE_CARD_TO_PLAY, getTilePosFromLine(line), True)
-            elif serverOutput == ServerOutputType.TURN_INDICATION:
-                serverMessage = ServerMessage(ServerOutputType.TURN_INDICATION, getPlayerToPlayFromLine(line), False)
-            elif serverOutput == ServerOutputType.TURN_INFO:
-                serverMessage =  ServerMessage(ServerOutputType.TURN_INFO,getTurnInfofromLine(line), True)
             elif serverOutput == ServerOutputType.ENABLE_POWER:
                 serverMessage = ServerMessage(ServerOutputType.ENABLE_POWER, [0, 1], True)
             elif serverOutput == ServerOutputType.CHOOSE_POSITION:
@@ -186,29 +190,38 @@ def serverOutputToServerMessage(line):
     return serverMessage 
 
 
-
-
-
+def serverInfosToServerMessage(line):
+    serverMessage = ServerMessage(ServerOutputType.NOT_IMPLEMENTED, 0, True) 
+    for  serverAskArray in SERVER_SAY_WORD_ARRAY:
+        if checkLineWith(serverAskArray, line) == True:
+            serverOutput = serverOutputWordToENum(serverAskArray)
+            if serverOutput == ServerOutputType.GHOST_ROLE:
+                serverMessage = ServerMessage(ServerOutputType.GHOST_ROLE, getColorGhostFromLine(line), False) 
+            elif serverOutput == ServerOutputType.TURN_INDICATION:
+                serverMessage = ServerMessage(ServerOutputType.TURN_INDICATION, getPlayerToPlayFromLine(line), False)
+            elif serverOutput == ServerOutputType.TURN_INFO:
+                serverMessage =  ServerMessage(ServerOutputType.TURN_INFO,getTurnInfofromLine(line), False)
+            elif serverOutput == ServerOutputType.END_GAME:
+                serverMessage = ServerMessage(ServerOutputType.END_GAME, 0, False)
+    return serverMessage 
 
 class Serializer:
 
-    def __init__(self,serverOutputFilePath, serverInputfilePath):
-        self.serverOutputFilePath = serverOutputFilePath
+    def __init__(self, serverQuestionsFilePath, serverInfosFilePath,  serverInputfilePath):
+        self.serverQuestionsFilePath = serverQuestionsFilePath
+        self.serverInfosFilePath = serverInfosFilePath
         self.serverInputfilePath = serverInputfilePath
 
-
-
-
-
-    def serialize(self):
-        print("[serializer] serialize : start serialize")
-        serverMessageArray = []
-        f = open(self.serverOutputFilePath, 'r')
-        for line in f.readlines():
-            serverMessageArray.append(serverOutputToServerMessage(line))
-        return serverMessageArray
-            
+    def serializeQuestionFile(self):
+        f = open(self.serverQuestionsFilePath, 'r',  encoding = "ISO-8859-1")
+        line = f.readlines()[-1]
+        return(serverOutputToServerMessage(line))
     
+    def serializeInfosFile(self):
+        f = open(self.serverInfosFilePath, 'r',  encoding = "ISO-8859-1")
+        line = f.readlines()[-1]
+        return(serverInfosToServerMessage(line))
+                
     def serverMessageToServerInput(self, iAMessage):
         if iAMessage.messageType == ServerInputType.CHOOSE_CARD_TO_PLAY:
             self.writeNumberResponse(serverMessage.content)
@@ -233,8 +246,6 @@ class Serializer:
         rf = open(self.serverInputfilePath,'w')
         rf.write(stringToWrite)
         rf.close()
-
-
 
     def deserialize(self, iAMessage):
         print("[deserialize] deserialize : start deserialize")
