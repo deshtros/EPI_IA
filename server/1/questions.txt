@@ -1,0 +1,1 @@
+positions disponibles : {8, 7}, choisir la valeur

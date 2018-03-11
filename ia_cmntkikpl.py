@@ -50,6 +50,7 @@ class CmntKiKpl:
     def play_blue_personnage(self):
         self.case_power = 1
         self.game.write_answer(self.case_power)
+        wait_for_next question
         self.game.write_answer(self.case_power)
         self.case_power = -1
 
@@ -162,7 +163,8 @@ class CmntKiKpl:
                 self.player_mov_inspector()
         if self.question.messageType == Parser.ServerOutputType.ENABLE_POWER:
             self.game.write_answer(1)
-            self.play_persnnage_skill()
+            wait_for_next question
+            self.play_personnage_skill()
 
     def play(self):
         print('[cmntkikpl] play : ia play')
