@@ -50,7 +50,6 @@ class CmntKiKpl:
     def play_blue_personnage(self):
         self.case_power = 1
         self.game.write_answer(self.case_power)
-        wait_for_next question
         self.game.write_answer(self.case_power)
         self.case_power = -1
 
@@ -138,22 +137,35 @@ class CmntKiKpl:
     def tuile_disponible(self, order):
         i = 0
         self.personnage = ''
+        if not self.question:
+            return
+        if not self.question.content:
+            return
         while order.__len__() > i:
             if self.question.content.color == order[i]:
                 if self.personnage == '':
                     self.personnage = order[i]
-                if not self.game.is_alone(order[i]):
-                    self.personnage = order[i]
-                    i = order.__len__() - 1
+                if self.game.get_role() == 'fantome':
+                    if self.game.is_alone(order[i]) == False:
+                        self.personnage = order[i]
+                        i = order.__len__() - 1
+                else:
+                    if self.game.is_alone(order[i]):
+                        self.personnage = order[i]
+                        i = order.__len__() - 1
             i += 1
         if self.personnage == '':
             print('[tuile disponible] error no tuile found/matched with order')
         self.game.response(self.personnage)
 
     def play_ia(self, order):
+        if not self.question:
+            return
         if self.question == self.game.get_question():
             return
         self.question = self.game.get_question()
+        if not self.question:
+            return
         if self.question.messageType == Parser.ServerOutputType.CHOOSE_CARD_TO_PLAY:
             self.tuile_disponible(order)
         if self.question.messageType == Parser.ServerOutputType.CHOOSE_POSITION:
@@ -163,7 +175,6 @@ class CmntKiKpl:
                 self.player_mov_inspector()
         if self.question.messageType == Parser.ServerOutputType.ENABLE_POWER:
             self.game.write_answer(1)
-            wait_for_next question
             self.play_personnage_skill()
 
     def play(self):

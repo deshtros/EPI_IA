@@ -214,8 +214,10 @@ class Serializer:
 
     def serializeQuestionFile(self):
         f = open(self.serverQuestionsFilePath, 'r',  encoding = "ISO-8859-1")
-        line = f.readlines()[-1]
-        return(serverOutputToServerMessage(line))
+        line = f.readlines()
+        if not line:
+            return ''
+        return(serverOutputToServerMessage(line[-1]))
     
     def serializeInfosFile(self):
         f = open(self.serverInfosFilePath, 'r',  encoding = "ISO-8859-1")

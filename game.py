@@ -73,7 +73,7 @@ class Game:
                 return character.position
 
 
-    def is_alone(color):
+    def is_alone(self, color):
         characterPosition = self.colorToPosition(color)
         if self._get_nb_personnage_in_case(characterPosition) == 1:
             return True
