@@ -32,8 +32,8 @@ class CmntKiKpl:
     def player_mov_inspector(self):
         case_allow = self.game.get_skill_case_allow()
         nb = 0
-        for i, move in case_allow:
-            nb_in_case = self.game._get_nb_personnage_in_case(move)
+        for i in case_allow:
+            nb_in_case = self.game._get_nb_personnage_in_case(i)
             if nb < nb_in_case:
                 nb = nb_in_case
                 self.case_move = i
@@ -94,7 +94,7 @@ class CmntKiKpl:
 
 
     def play_purple_personnage(self):
-        case_allow = self.serializer.get_skill_case_allow()
+        case_allow = self.game.get_skill_case_allow()
         self.case_power = -1
         self.game.response('rose')
         self.case_power = -1
@@ -156,17 +156,18 @@ class CmntKiKpl:
         if self.question.messageType == Parser.ServerOutputType.CHOOSE_CARD_TO_PLAY:
             self.tuile_disponible(order)
         if self.question.messageType == Parser.ServerOutputType.CHOOSE_POSITION:
-            if self.serializer.get_role() == 'fantome':
+            if self.game.get_role() == 'fantome':
                 self.player_mov_fantome()
             else:
                 self.player_mov_inspector()
         if self.question.messageType == Parser.ServerOutputType.ENABLE_POWER:
-            self.serializer.write_answer(1)
+            self.game.write_answer(1)
             self.play_persnnage_skill()
 
     def play(self):
         print('[cmntkikpl] play : ia play')
         while self.game.get_finished():
+            print(self.game)
             if self.game.get_role() == 'fantome':
                 self.play_ia(self.fantome_order)
             else:
