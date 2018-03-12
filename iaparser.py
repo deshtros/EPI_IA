@@ -1,4 +1,5 @@
 from enum import Enum
+import time 
 
 passages = [{1,4},{0,2},{1,3},{2,7},{0,5,8},{4,6},{5,7},{3,6,9},{4,9},{7,8}]
 pass_ext = [{1,4},{0,2,5,7},{1,3,6},{2,7},{0,5,8,9},{4,6,1,8},{5,7,2,9},{3,6,9,1},{4,9,5},{7,8,4,6}]
@@ -216,13 +217,17 @@ class Serializer:
         f = open(self.serverQuestionsFilePath, 'r',  encoding = "ISO-8859-1")
         line = f.readlines()
         if not line:
-            return ''
+            time.sleep(1)
+            return self.serializeQuestionFile()
         return(serverOutputToServerMessage(line[-1]))
     
     def serializeInfosFile(self):
         f = open(self.serverInfosFilePath, 'r',  encoding = "ISO-8859-1")
-        line = f.readlines()[-1]
-        return(serverInfosToServerMessage(line))
+        line = f.readlines()
+        if not line:
+            time.sleep(1)
+            return self.serializeInfosFile()
+        return(serverInfosToServerMessage(line[-1]))
                 
     def serverMessageToServerInput(self, iAMessage):
         if iAMessage.messageType == ServerInputType.CHOOSE_CARD_TO_PLAY:
@@ -246,7 +251,7 @@ class Serializer:
 
     def writeStringResponse(self, stringToWrite):
         rf = open(self.serverInputfilePath,'w')
-        rf.write(stringToWrite)
+        rf.write(str(stringToWrite))
         rf.close()
 
     def deserialize(self, iAMessage):

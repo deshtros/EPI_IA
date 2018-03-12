@@ -10,7 +10,7 @@ pass_ext = [{1,4},{0,2,5,7},{1,3,6},{2,7},{0,5,8,9},{4,6,1,8},{5,7,2,9},{3,6,9,1
 class CmntKiKpl:
     def __init__(self, path):
         self.path = path
-        serializer = Parser.Serializer(self.path + '/questions.txt', self.path + '/infos.txt', self.path + '/out.txt')
+        serializer = Parser.Serializer(self.path + '/questions.txt', self.path + '/infos.txt', self.path + '/reponses.txt')
         self.game = g.Game(serializer)
         self.fantome_order = ['rouge', 'blanc', 'noir', 'gris', 'bleu', 'rose', 'violet', 'marron']
         self.inspector_order = ['noir', 'blanc', 'gris', 'rose', 'bleu', 'rouge', 'violet', 'marron']
@@ -134,20 +134,32 @@ class CmntKiKpl:
             self.play_brown_personnage()
             return
 
+    def getCharacterIsPresent(self, characterArray, colorTofind):
+        for i in range(0, characterArray.__len__()):
+            if characterArray[i].color == colorTofind:
+                return True
+        return False
+
+    def getCharacterToPlay(self, characterArray, colorTofind):
+        for i in range(0, characterArray.len()):
+            if characterArray[i].color == colorTofind:
+                return i 
+        return 0
+
     def tuile_disponible(self, order):
         i = 0
         self.personnage = ''
         while order.__len__() > i:
-            if self.question.content.__content__(order[i]):
+            if self.getCharacterIsPresent(self.question.content, order[i]):
                 if self.personnage == '':
                     self.personnage = 0
                 if self.game.get_role() == 'fantome':
                     if self.game.is_alone(order[i]) == False:
-                        self.personnage = self.question.content.index(order[i])
+                        self.personnage = self.getCharacterToPlay(self.question.content, order[i])
                         i = order.__len__() - 1
                 else:
                     if self.game.is_alone(order[i]):
-                        self.personnage = self.question.content.index(order[i])
+                        self.personnage =  self.getCharacterToPlay(self.question.content, order[i])
                         i = order.__len__() - 1
             i += 1
         if self.personnage == '':
